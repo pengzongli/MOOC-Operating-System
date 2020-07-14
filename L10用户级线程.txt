@@ -1,0 +1,59 @@
+多进程是操作系统的基本图像
+
+代码 栈 PCB 现场 映射表
+
+进程=资源+指令执行序列
+将资源的和指令执行分开
+一个资源+多个指令执行序列
+
+线程：保留了并发的优点，避免了进程切换代价
+
+线程的切换：
+实质就是映射表不变而PC指针变
+
+多个执行序列+一个地址空间
+
+两个线程：两个TCB、两个栈、切换的PC在栈中
+
+Yield？ Create？
+
+Yield线程切换
+void Yield(){
+    TCB1.esp=esp;
+    esp=TCB2.esp;
+}
+
+void ThreadCreate(A)
+{
+    TCB *tcb=malloc();
+    *stack=malloc();
+    *stack=A;
+    tcb.esp=stack;
+}
+
+示例：
+void WebExplorer()//main()
+{
+    ThreadCreate(GetData, URL, buffer);...
+    while(1)Yield();
+}
+
+void GetData(char *URL, char *p)
+{
+    连接URL; 下载; Yield();...
+}
+
+void ThreadCreate(func, arg1)
+{
+    申请栈; 申请TCB; func等入栈; 关联TCB与栈;...
+}
+
+void Yield()
+{
+    压入现场; esp放在当前TCB中 Next(); 从下个TCB取出esp; 弹栈切换线程;
+}
+
+
+
+
+
