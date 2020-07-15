@@ -1,0 +1,54 @@
+核心级线程
+
+多核和多处理起的区别
+
+多处理器每个CPU对应一个Cache和MMU
+多核就是多个CPU共用一个Cache和MMU
+
+和用户级相比，核心级线程有什么区别？
+用户栈 内核栈 
+一个栈到一套栈；两个栈到两套栈
+
+用户栈和内核栈之间的关联
+内核栈的源SS和源SP指向用户栈
+
+所有的中断（时钟、外设、INT指令）都引起用户栈切换到内核栈
+
+内核线程switch_to的五段论:
+
+1.中断入口:（进入切换）
+ push ds;... pusha;
+ mov ds, 内核段号; ...
+ calll 中断处理
+??:
+
+2.中断处理：(引发切换)
+ 启动磁盘读或时钟中断;
+ schedule();
+}//ret
+
+3.schedule: next=:..;
+ call switch_to;
+}//ret
+
+4.switch_to:(内核栈切换)
+TCB[cur].esp=%esp;
+%esp=TCB[next].esp;
+ret
+
+5.中断出口:(第二级切换)
+popa;...;pop ds;
+iret
+
+
+void ThreadCreate(...)
+{
+    TCB tcb=get_free_page();
+    *krlstack=...;
+    *userstack传入;
+    填写两个stack;
+    tcb.esp=krlstack;
+    tcb.状态=就绪;
+    tcb入队;
+}
+
