@@ -1,0 +1,64 @@
+main()
+{
+    if(!fork()){
+        while(1){printf("A");}    
+    }
+    if(!fork())
+    {
+        while(1){printf("A");}   
+    }
+}
+
+main(){
+    mov __NR_fork, %eax
+    int 0x80
+100:mov %eax, res
+    cmpl res,0
+    jne 208
+200:printf("A")
+    jmp 200
+208:...
+304:wait()
+}
+
+INT进入内核
+main(){
+    mov __NR_fork, %eax
+    int 0x80
+100:mov %eax, res
+    cmpl res,0
+}
+
+(2)set_system_gate(0x80,&system_call);
+(3)system_call:
+    call sys_call_table(,%eax,4)
+
+sys_fork:
+    pushl ...
+    call copy_process
+    ret
+
+copy_process(...long eip, ...){
+    p = (PCB *)get_free_page();
+    p -> tss.esp0 = p+4k;
+    p -> tss.esp = esp
+    p -> tss.eax = 0;
+    p -> tss.eip = eip; ...
+}
+
+copy_process(){}//ret到哪里？
+sys_fork:
+    ...call copy_process ...
+    ret     //到哪里？
+system_call:
+    ...call sys_call_table(,%eax,4)
+    cmpl $0,state(current)
+    jne reschedule
+    iret    //到哪去？
+main:int 0x80
+    100:mov %eax, ret cmpl res,0
+
+
+
+
+
